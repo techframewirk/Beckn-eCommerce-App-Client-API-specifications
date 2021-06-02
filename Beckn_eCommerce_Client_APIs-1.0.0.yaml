@@ -1,0 +1,1532 @@
+---
+openapi: 3.0.0
+info:
+  title: Beckn eCommerce Client APIs
+  description: API sepcifications for Beckn eCommerce Client
+  version: 1.0.0
+servers:
+- url: https://virtserver.swaggerhub.com/beckn/Beckn_eCommerce_Client_APIs/1.0.0
+  description: SwaggerHub API Auto Mocking
+tags:
+- name: discovery
+  description: search APIs for the client
+- name: order
+  description: order related APIs for the client
+- name: fulfilment
+  description: fulfilment related APIs for the client
+- name: post-fulfilment
+  description: post-fulfilment related APIs for the client
+- name: feedback
+  description: feebback APIs for the client
+- name: meta
+  description: meta APIs for the client
+- name: account
+  description: order related APIs for the client
+paths:
+  /search:
+    get:
+      tags:
+      - discovery
+      summary: Sends a search request to BAP
+      description: |
+        By passing in the appropriate options, you can search for
+        available items.
+      parameters:
+      - name: searchString
+        in: query
+        description: pass an optional search string for search
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: searchType
+        in: query
+        description: pass an optional search type for search
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - item
+          - brand
+          - offer
+          - vendor
+          - category
+      - name: location
+        in: query
+        description: pass the gps co-ordinates for search
+        required: true
+        style: form
+        explode: true
+        schema:
+          $ref: '#/components/schemas/Gps'
+      - name: skip
+        in: query
+        description: number of records to skip for pagination
+        required: false
+        style: form
+        explode: true
+        schema:
+          minimum: 0
+          type: integer
+          format: int32
+      - name: limit
+        in: query
+        description: maximum number of records to return
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 50
+          minimum: 0
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ack'
+        "400":
+          description: bad input parameter
+      security:
+      - bearerAuth: []
+  /on_search:
+    get:
+      tags:
+      - discovery
+      summary: Sends a search request to BAP
+      description: poll for response from BAP
+      parameters:
+      - name: messegeId
+        in: query
+        description: messege id of the request
+        required: false
+        style: form
+        explode: true
+        schema:
+          $ref: '#/components/schemas/Ack/properties/message_id'
+      - name: skip
+        in: query
+        description: number of records to skip for pagination
+        required: false
+        style: form
+        explode: true
+        schema:
+          minimum: 0
+          type: integer
+          format: int32
+      - name: limit
+        in: query
+        description: maximum number of records to return
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 50
+          minimum: 0
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProviderWithItems'
+        "400":
+          description: bad input parameter
+      security:
+      - bearerAuth: []
+  /rate:
+    post:
+      tags:
+      - feedback
+      summary: Sends feedback for an entity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/body'
+      responses:
+        "201":
+          description: ratings submitted
+        "400":
+          description: bad input parameter
+      security:
+      - bearerAuth: []
+  /get_quote:
+    post:
+      tags:
+      - order
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartObject'
+      responses:
+        "200":
+          description: quotation returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ack'
+        "400":
+          description: bad input parameter
+      security:
+      - bearerAuth: []
+  /on_get_quote:
+    get:
+      tags:
+      - order
+      parameters:
+      - name: messegeId
+        in: query
+        description: messege id of the request
+        required: false
+        style: form
+        explode: true
+        schema:
+          $ref: '#/components/schemas/Ack/properties/message_id'
+      responses:
+        "200":
+          description: quotation returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quotation'
+        "400":
+          description: bad input parameter
+      security:
+      - bearerAuth: []
+  /get_fulfilment_options:
+    post:
+      tags:
+      - discovery
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartObject'
+      responses:
+        "200":
+          description: fulfilment details returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FulfilmentDetails'
+        "400":
+          description: bad input parameter
+      security:
+      - bearerAuth: []
+  /get_order_policy:
+    post:
+      tags:
+      - meta
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/body_1'
+      responses:
+        "200":
+          description: fulfilment details returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FulfilmentDetails'
+        "400":
+          description: bad input parameter
+      security:
+      - bearerAuth: []
+  /initialize_order:
+    post:
+      tags:
+      - order
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/body_2'
+      responses:
+        "200":
+          description: Order details with payment options
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ack'
+        "400":
+          description: bad input parameter
+      security:
+      - bearerAuth: []
+  /on_initialize_order:
+    get:
+      tags:
+      - order
+      parameters:
+      - name: messegeId
+        in: query
+        description: messege id of the request
+        required: false
+        style: form
+        explode: true
+        schema:
+          $ref: '#/components/schemas/Ack/properties/message_id'
+      responses:
+        "200":
+          description: Order details with payment options
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+        "400":
+          description: bad input parameter
+      security:
+      - bearerAuth: []
+  /confirm_order:
+    post:
+      tags:
+      - order
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/body_3'
+      responses:
+        "200":
+          description: Order details with payment options
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ack'
+        "400":
+          description: bad input parameter
+      security:
+      - bearerAuth: []
+  /on_confirm_order:
+    get:
+      tags:
+      - order
+      parameters:
+      - name: messegeId
+        in: query
+        description: messege id of the request
+        required: false
+        style: form
+        explode: true
+        schema:
+          $ref: '#/components/schemas/Ack/properties/message_id'
+      responses:
+        "200":
+          description: Order details with payment options
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        "400":
+          description: bad input parameter
+      security:
+      - bearerAuth: []
+  /get_order_status:
+    get:
+      tags:
+      - fulfilment
+      parameters:
+      - name: orderId
+        in: query
+        description: messege id of the request
+        required: false
+        style: form
+        explode: true
+        schema:
+          $ref: '#/components/schemas/Ack/properties/message_id'
+      responses:
+        "200":
+          description: Order status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        "400":
+          description: bad input parameter
+      security:
+      - bearerAuth: []
+  /track_order:
+    post:
+      tags:
+      - fulfilment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/body_4'
+      responses:
+        "200":
+          description: Order status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ack'
+        "400":
+          description: bad input parameter
+      security:
+      - bearerAuth: []
+  /on_track_order:
+    get:
+      tags:
+      - fulfilment
+      parameters:
+      - name: messegeId
+        in: query
+        description: messege id of the request
+        required: false
+        style: form
+        explode: true
+        schema:
+          $ref: '#/components/schemas/Ack/properties/message_id'
+      responses:
+        "200":
+          description: Order status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tracking'
+        "400":
+          description: bad input parameter
+      security:
+      - bearerAuth: []
+  /edit_order:
+    post:
+      tags:
+      - fulfilment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/body_5'
+      responses:
+        "200":
+          description: Order details with payment options
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ack'
+        "400":
+          description: bad input parameter
+      security:
+      - bearerAuth: []
+  /on_edit_order:
+    get:
+      tags:
+      - fulfilment
+      parameters:
+      - name: messegeId
+        in: query
+        description: messege id of the request
+        required: false
+        style: form
+        explode: true
+        schema:
+          $ref: '#/components/schemas/Ack/properties/message_id'
+      responses:
+        "200":
+          description: Order details with payment options
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        "400":
+          description: bad input parameter
+      security:
+      - bearerAuth: []
+  /return_order:
+    post:
+      tags:
+      - post-fulfilment
+      description: initiate return of an order. Cart will have objects in the order to return
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/body_6'
+      responses:
+        "200":
+          description: Order details with payment options
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ack'
+        "400":
+          description: bad input parameter
+      security:
+      - bearerAuth: []
+  /on_return_order:
+    get:
+      tags:
+      - post-fulfilment
+      description: initiate return of an order. Cart will have objects in the order to return
+      parameters:
+      - name: messegeId
+        in: query
+        description: messege id of the request
+        required: false
+        style: form
+        explode: true
+        schema:
+          $ref: '#/components/schemas/Ack/properties/message_id'
+      responses:
+        "200":
+          description: Order details with payment options
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        "400":
+          description: bad input parameter
+      security:
+      - bearerAuth: []
+  /replace_order:
+    post:
+      tags:
+      - post-fulfilment
+      description: initiate return of an order. Cart will have objects in the order to replace
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/body_7'
+      responses:
+        "200":
+          description: Order details with payment options
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ack'
+        "400":
+          description: bad input parameter
+      security:
+      - bearerAuth: []
+  /on_replace_order:
+    get:
+      tags:
+      - post-fulfilment
+      description: initiate return of an order. Cart will have objects in the order to replace
+      parameters:
+      - name: messegeId
+        in: query
+        description: messege id of the request
+        required: false
+        style: form
+        explode: true
+        schema:
+          $ref: '#/components/schemas/Ack/properties/message_id'
+      responses:
+        "200":
+          description: Order details with payment options
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        "400":
+          description: bad input parameter
+      security:
+      - bearerAuth: []
+  /cancel_order:
+    post:
+      tags:
+      - fulfilment
+      description: initiate cancellation of an order.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/body_8'
+      responses:
+        "200":
+          description: Order details with payment options
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ack'
+        "400":
+          description: bad input parameter
+      security:
+      - bearerAuth: []
+  /on_cancel_order:
+    get:
+      tags:
+      - fulfilment
+      description: initiate cancellation of an order.
+      parameters:
+      - name: messegeId
+        in: query
+        description: messege id of the request
+        required: false
+        style: form
+        explode: true
+        schema:
+          $ref: '#/components/schemas/Ack/properties/message_id'
+      responses:
+        "200":
+          description: Order details with payment options
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        "400":
+          description: bad input parameter
+      security:
+      - bearerAuth: []
+  /get_support:
+    post:
+      tags:
+      - post-fulfilment
+      description: get support details
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/body_9'
+      responses:
+        "200":
+          description: Order details with payment options
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ack'
+        "400":
+          description: bad input parameter
+      security:
+      - bearerAuth: []
+  /on_get_support:
+    get:
+      tags:
+      - post-fulfilment
+      description: get support details
+      parameters:
+      - name: messegeId
+        in: query
+        description: messege id of the request
+        required: false
+        style: form
+        explode: true
+        schema:
+          $ref: '#/components/schemas/Ack/properties/message_id'
+      responses:
+        "200":
+          description: Order details with payment options
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Support'
+        "400":
+          description: bad input parameter
+      security:
+      - bearerAuth: []
+  /address:
+    get:
+      tags:
+      - account
+      description: get saved addresses in the account
+      parameters:
+      - name: id
+        in: query
+        description: optionally pass the id of the address to be retreived
+        required: false
+        style: form
+        explode: true
+        schema:
+          $ref: '#/components/schemas/SavedAddress/properties/id'
+      responses:
+        "200":
+          description: Addresses fetched
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SavedAddress'
+        "400":
+          description: bad input parameter
+      security:
+      - bearerAuth: []
+    put:
+      tags:
+      - account
+      description: edit an address in the account
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SavedAddress'
+      responses:
+        "200":
+          description: Address edited
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavedAddress'
+        "400":
+          description: bad input parameter
+      security:
+      - bearerAuth: []
+    post:
+      tags:
+      - account
+      description: add a new address to the account
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/body_10'
+      responses:
+        "201":
+          description: Address added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavedAddress'
+        "400":
+          description: bad input parameter
+      security:
+      - bearerAuth: []
+    delete:
+      tags:
+      - account
+      description: delete an address in the account
+      parameters:
+      - name: id
+        in: query
+        description: pass the id of the address to be deleted
+        required: true
+        style: form
+        explode: true
+        schema:
+          $ref: '#/components/schemas/SavedAddress/properties/id'
+      responses:
+        "200":
+          description: Address deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavedAddress'
+        "400":
+          description: bad input parameter
+      security:
+      - bearerAuth: []
+  /billing_details:
+    get:
+      tags:
+      - account
+      description: get saved addresses in the account
+      parameters:
+      - name: id
+        in: query
+        description: optionally pass the id of the billing detail to be retreived
+        required: false
+        style: form
+        explode: true
+        schema:
+          $ref: '#/components/schemas/SavedBillingDetails/properties/id'
+      - name: default
+        in: query
+        description: optionally pass true to fetch default billing details
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      responses:
+        "200":
+          description: Addresses fetched
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SavedBillingDetails'
+        "400":
+          description: bad input parameter
+      security:
+      - bearerAuth: []
+    put:
+      tags:
+      - account
+      description: edit an existing billing detail in the account
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SavedBillingDetails'
+      responses:
+        "200":
+          description: Billing details edited
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavedBillingDetails'
+        "400":
+          description: bad input error
+      security:
+      - bearerAuth: []
+    post:
+      tags:
+      - account
+      description: add new billing detail to account
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillingDetails'
+      responses:
+        "201":
+          description: Billing details added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavedBillingDetails'
+        "400":
+          description: bad input parameter
+      security:
+      - bearerAuth: []
+    delete:
+      tags:
+      - account
+      description: delete a billing details record in the account
+      parameters:
+      - name: id
+        in: query
+        description: pass the id of the address to be deleted
+        required: true
+        style: form
+        explode: true
+        schema:
+          $ref: '#/components/schemas/SavedBillingDetails/properties/id'
+      responses:
+        "200":
+          description: Billing details deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavedBillingDetails'
+        "400":
+          description: bad input parameter
+      security:
+      - bearerAuth: []
+  /orders:
+    get:
+      tags:
+      - account
+      description: get orders in the account
+      parameters:
+      - name: id
+        in: query
+        description: optionally pass the id of the billing detail to be retreived
+        required: false
+        style: form
+        explode: true
+        schema:
+          $ref: '#/components/schemas/Order/properties/id'
+      responses:
+        "200":
+          description: Orders fetched
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+        "400":
+          description: bad input parameter
+      security:
+      - bearerAuth: []
+components:
+  schemas:
+    Ack:
+      type: object
+      properties:
+        status:
+          type: string
+          description: Describe the status of the ACK response. If schema validation passes, status is ACK else it is NACK
+          enum:
+          - ACK
+          - NACK
+        message_id:
+          type: string
+      description: Acknowledgement of call with message id for callback
+    ProviderWithItems:
+      type: object
+      properties:
+        provider:
+          $ref: '#/components/schemas/Provider'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Item'
+        catagories:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category'
+        offers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Offer'
+      description: Response structure of search
+    Provider:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique id of the service provider
+        name:
+          type: string
+          description: Name of the service provider
+        descriptor:
+          type: string
+          description: Description of the service provider
+        locations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Gps'
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/Image'
+      description: Describes a service provider
+    Payment:
+      type: object
+      properties:
+        upi_id:
+          type: string
+      description: Details required for payment
+    Item:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique id of the item
+        name:
+          type: string
+        parent_item_id:
+          $ref: '#/components/schemas/Item/properties/id'
+        descriptor:
+          type: string
+          description: Description of the item
+        price:
+          $ref: '#/components/schemas/Price'
+        category_id:
+          $ref: '#/components/schemas/Category/properties/id'
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/Image'
+        attributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemAttribute'
+        configurable_attributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConfigurableItemAttribute'
+        addons:
+          type: array
+          items:
+            $ref: '#/components/schemas/AddOn'
+        tags:
+          $ref: '#/components/schemas/Tag'
+      description: Describes an item
+    Category:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique id of the category
+        name:
+          type: string
+        descriptor:
+          type: string
+          description: Description of the item
+        tags:
+          $ref: '#/components/schemas/Tag'
+      description: Describes a category
+    Gps:
+      pattern: ^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$
+      type: string
+      description: Describes a gps coordinate
+    Image:
+      type: string
+      description: 'Image of an object. <br/><br/> A url based image will look like <br/><br/>```uri:http://path/to/image``` <br/><br/> An image can also be sent as a data string. For example : <br/><br/> ```data:js87y34ilhriuho84r3i4```'
+    Tag:
+      type: object
+      additionalProperties:
+        type: string
+      description: Describes a tag. This is a simple key-value store which is used to contain extended metadata
+    ItemAttribute:
+      type: object
+      additionalProperties:
+        type: string
+      description: Describes a product attribute. This is a simple key-value store which is used to contain additional attributes of a product.
+    ConfigurableItemAttribute:
+      type: object
+      properties:
+        name:
+          type: string
+        permissibleValues:
+          type: array
+          items:
+            type: string
+      description: Describes a product attribute. This is a simple key-value store which is used to contain additional attributes of a product.
+    Offer:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        descriptor:
+          type: string
+        category_ids:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category/properties/id'
+        item_ids:
+          type: array
+          items:
+            $ref: '#/components/schemas/Item/properties/id'
+      description: Describes an offer
+    Price:
+      description: Describes the price of an item.
+      allOf:
+      - $ref: '#/components/schemas/MonetaryValue'
+      - properties:
+          estimated_value:
+            $ref: '#/components/schemas/DecimalValue'
+          computed_value:
+            $ref: '#/components/schemas/DecimalValue'
+          listed_value:
+            $ref: '#/components/schemas/DecimalValue'
+          offered_value:
+            $ref: '#/components/schemas/DecimalValue'
+          minimum_value:
+            $ref: '#/components/schemas/DecimalValue'
+          maximum_value:
+            $ref: '#/components/schemas/DecimalValue'
+    DecimalValue:
+      pattern: '[+-]?([0-9]*[.])?[0-9]+'
+      type: string
+      description: Describes a decimal value
+    MonetaryValue:
+      type: object
+      properties:
+        currency:
+          type: string
+        value:
+          $ref: '#/components/schemas/DecimalValue'
+      description: Describes a monetary value used for exchange
+    AddOn:
+      type: object
+      properties:
+        id:
+          type: string
+          description: unique id of the add on
+        descriptor:
+          type: string
+          description: description of the add on
+        price:
+          $ref: '#/components/schemas/Price'
+      description: Describes an add-on
+    PaymentOptions:
+      type: object
+      properties:
+        for:
+          type: string
+          enum:
+          - delivery
+          - retail
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentOptions_options'
+    CartObject:
+      type: object
+      properties:
+        provider:
+          $ref: '#/components/schemas/Provider'
+        location:
+          $ref: '#/components/schemas/Gps'
+        cart:
+          type: array
+          items:
+            $ref: '#/components/schemas/CartObject_cart'
+        offers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Offer/properties/id'
+        addons:
+          type: array
+          items:
+            $ref: '#/components/schemas/AddOn'
+    Quotation:
+      type: object
+      properties:
+        price:
+          $ref: '#/components/schemas/Price'
+        breakup:
+          type: array
+          items:
+            $ref: '#/components/schemas/Quotation_breakup'
+      description: Describes a quote
+    Order:
+      type: object
+      properties:
+        id:
+          type: string
+        state:
+          type: string
+        quotation:
+          $ref: '#/components/schemas/Quotation'
+        items:
+          $ref: '#/components/schemas/CartObject'
+        fulfilment_details:
+          $ref: '#/components/schemas/FulfilmentDetails'
+      description: Describes an order
+    Policy:
+      type: object
+      properties:
+        owner_entity_id:
+          type: string
+          description: Id of the entity which the policy is applicable to (BPP, provider, item)
+        policy_type:
+          type: string
+          description: Type of policy
+          enum:
+          - order_return
+          - order_cancellation
+          - order_replacement
+          - order_update
+        descriptor:
+          type: string
+          description: Description of policy
+        reasons:
+          type: array
+          description: allowable reasons if it exists for a policy(cancellation reason, return reason etc)
+          items:
+            $ref: '#/components/schemas/Policy_reasons'
+      description: Describes a policy
+    FulfilmentDetails:
+      type: object
+      properties:
+        fulfilled_by:
+          type: string
+          description: name of service provider doing fulfilment
+        price:
+          $ref: '#/components/schemas/Price'
+        drop_time:
+          type: string
+        tracking:
+          type: boolean
+          description: Indicates whether the fulfillment allows tracking
+          default: false
+        pickup_address:
+          $ref: '#/components/schemas/FulfilmentDetails_pickup_address'
+      description: Details of fulfilment
+    SavedBillingDetails:
+      type: object
+      properties:
+        id:
+          type: string
+          description: unique id of the address
+      description: An address saved in the db
+      allOf:
+      - $ref: '#/components/schemas/BillingDetails'
+    BillingDetails:
+      required:
+      - name
+      - phone
+      type: object
+      properties:
+        name:
+          type: string
+          description: Personal details of the customer needed for billing.
+        organization:
+          $ref: '#/components/schemas/Organization'
+        address_id:
+          $ref: '#/components/schemas/SavedAddress/properties/id'
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        tax_number:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      description: Describes a billing event
+      default:
+        type: boolean
+        default: false
+    Organization:
+      type: object
+      properties:
+        name:
+          type: string
+        cred:
+          type: string
+      description: Describes an organization
+    SavedAddress:
+      type: object
+      properties:
+        id:
+          type: string
+          description: unique id of the address
+      description: An address saved in the db
+      allOf:
+      - $ref: '#/components/schemas/Address'
+    Support:
+      type: object
+      properties:
+        phone:
+          type: string
+          format: phone
+        email:
+          type: string
+          format: email
+        uri:
+          type: string
+          format: uri
+    Tracking:
+      type: object
+      properties:
+        tl_method:
+          type: string
+          enum:
+          - http/get
+          - ws
+        url:
+          type: string
+          format: uri
+        status:
+          type: string
+          enum:
+          - active
+          - inactive
+        agent:
+          $ref: '#/components/schemas/Tracking_agent'
+      description: Describes the tracking info of an object
+    Address:
+      type: object
+      properties:
+        door:
+          type: string
+          description: Door / Shop number of the address
+        name:
+          type: string
+          description: Name of address if applicable. Example, shop name
+        building:
+          type: string
+          description: Name of the building or block
+        street:
+          type: string
+          description: Street name or number
+        locality:
+          type: string
+          description: Name of the locality, apartments
+        ward:
+          type: string
+          description: Name or number of the ward if applicable
+        city:
+          type: string
+          description: City name
+        state:
+          type: string
+          description: State name
+        country:
+          type: string
+          description: Country name
+        area_code:
+          type: string
+          description: Area code. This can be Pincode, ZIP code or any equivalent
+        default_billing_address:
+          type: boolean
+          default: false
+        default_shipping_address:
+          type: boolean
+          default: false
+      description: Describes an address
+    body:
+      type: object
+      properties:
+        entity_id:
+          type: string
+        enitity_type:
+          type: string
+          enum:
+          - provider
+          - item
+          - delivery
+        rating:
+          maximum: 5
+          minimum: 0
+          type: number
+        feedback:
+          type: string
+    body_1:
+      type: object
+      properties:
+        location:
+          $ref: '#/components/schemas/Gps'
+        provider_id:
+          $ref: '#/components/schemas/Provider/properties/id'
+        policy_type:
+          $ref: '#/components/schemas/Policy/properties/policy_type'
+        policy:
+          type: array
+          items:
+            $ref: '#/components/schemas/Policy'
+    initialize_order_fulfilment:
+      type: object
+      properties:
+        payment:
+          $ref: '#/components/schemas/PaymentOptions'
+    body_2:
+      type: object
+      properties:
+        fulfilment:
+          $ref: '#/components/schemas/initialize_order_fulfilment'
+        billing_details_id:
+          $ref: '#/components/schemas/SavedBillingDetails/properties/id'
+        payment:
+          $ref: '#/components/schemas/PaymentOptions'
+      allOf:
+      - $ref: '#/components/schemas/CartObject'
+    inline_response_200:
+      type: object
+      properties:
+        order_id:
+          $ref: '#/components/schemas/Order/properties/id'
+        order_state:
+          $ref: '#/components/schemas/Order/properties/state'
+        payment:
+          $ref: '#/components/schemas/Payment'
+    body_3:
+      type: object
+      properties:
+        order_id:
+          $ref: '#/components/schemas/Order/properties/id'
+    inline_response_200_1:
+      type: object
+      properties:
+        order_id:
+          $ref: '#/components/schemas/Order/properties/id'
+        order_state:
+          $ref: '#/components/schemas/Order/properties/state'
+    body_4:
+      type: object
+      properties:
+        order_id:
+          $ref: '#/components/schemas/Order/properties/id'
+    body_5:
+      type: object
+      properties:
+        order_id:
+          $ref: '#/components/schemas/Order/properties/id'
+        fulfilment:
+          $ref: '#/components/schemas/FulfilmentDetails'
+        reason_id:
+          type: string
+      allOf:
+      - $ref: '#/components/schemas/CartObject'
+    body_6:
+      type: object
+      properties:
+        order_id:
+          $ref: '#/components/schemas/Order/properties/id'
+        fulfilment:
+          $ref: '#/components/schemas/FulfilmentDetails'
+        reason_id:
+          type: string
+      allOf:
+      - $ref: '#/components/schemas/CartObject'
+    body_7:
+      type: object
+      properties:
+        order_id:
+          $ref: '#/components/schemas/Order/properties/id'
+        fulfilment:
+          $ref: '#/components/schemas/FulfilmentDetails'
+        reason_id:
+          type: string
+      allOf:
+      - $ref: '#/components/schemas/CartObject'
+    body_8:
+      type: object
+      properties:
+        order_id:
+          $ref: '#/components/schemas/Order/properties/id'
+        reason_id:
+          type: string
+    body_9:
+      type: object
+      properties:
+        order_id:
+          $ref: '#/components/schemas/Order/properties/id'
+    body_10:
+      type: object
+      properties:
+        address:
+          $ref: '#/components/schemas/Address'
+        location:
+          $ref: '#/components/schemas/Gps'
+    PaymentOptions_options:
+      type: object
+      properties:
+        option_name:
+          type: string
+        option_categories:
+          type: array
+          items:
+            type: string
+            enum:
+            - now
+            - after_delivery
+            - before_delivery
+    CartObject_cart:
+      type: object
+      properties:
+        item:
+          $ref: '#/components/schemas/Item/properties/id'
+        quantity:
+          type: string
+    Quotation_breakup:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - item
+          - offer
+          - add-on
+          - fulfillment
+        ref_id:
+          type: string
+        title:
+          type: string
+        price:
+          $ref: '#/components/schemas/Price'
+    Policy_reasons:
+      type: object
+      properties:
+        text:
+          type: string
+        id:
+          type: string
+    FulfilmentDetails_pickup_address:
+      type: object
+      properties:
+        address_string:
+          type: string
+          description: pick up address as a string
+        address_location:
+          $ref: '#/components/schemas/Gps'
+    Tracking_agent:
+      type: object
+      properties:
+        name:
+          type: string
+        phone_no:
+          type: string
+        vehicle_no:
+          type: string
+      description: The person who fulfills the order
+  parameters:
+    searchStringParameter:
+      name: searchString
+      in: query
+      description: pass an optional search string for search
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: string
+    locationParameter:
+      name: location
+      in: query
+      description: pass the gps co-ordinates for search
+      required: true
+      style: form
+      explode: true
+      schema:
+        $ref: '#/components/schemas/Gps'
+    searchTypeParameter:
+      name: searchType
+      in: query
+      description: pass an optional search type for search
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: string
+        enum:
+        - item
+        - brand
+        - offer
+        - vendor
+        - category
+    skipParameter:
+      name: skip
+      in: query
+      description: number of records to skip for pagination
+      required: false
+      style: form
+      explode: true
+      schema:
+        minimum: 0
+        type: integer
+        format: int32
+    messegeIdParameter:
+      name: messegeId
+      in: query
+      description: messege id of the request
+      required: false
+      style: form
+      explode: true
+      schema:
+        $ref: '#/components/schemas/Ack/properties/message_id'
+    orderIdParameter:
+      name: orderId
+      in: query
+      description: messege id of the request
+      required: false
+      style: form
+      explode: true
+      schema:
+        $ref: '#/components/schemas/Ack/properties/message_id'
+    limitParameter:
+      name: limit
+      in: query
+      description: maximum number of records to return
+      required: false
+      style: form
+      explode: true
+      schema:
+        maximum: 50
+        minimum: 0
+        type: integer
+        format: int32
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
